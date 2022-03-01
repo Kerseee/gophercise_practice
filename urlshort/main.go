@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -12,11 +11,6 @@ import (
 
 type config struct {
 	yamlFile string
-}
-
-type application struct {
-	config config
-	logger *log.Logger
 }
 
 func main() {
