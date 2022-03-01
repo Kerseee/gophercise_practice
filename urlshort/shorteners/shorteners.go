@@ -1,4 +1,6 @@
-package main
+// shorteners contains some handlers that parse files like yaml or json and return
+// http handlers.
+package shorteners
 
 import (
 	"net/http"

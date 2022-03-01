@@ -1,11 +1,30 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+
+	"kerseeehuang.com/urlshort/shorteners"
 )
 
+type config struct {
+	yamlFile string
+}
+
+type application struct {
+	config config
+	logger *log.Logger
+}
+
 func main() {
+	// Configure the settings.
+	var cfg config
+	flag.StringVar(&cfg.yamlFile, "yaml", "yamls/example.yaml", "yaml file path")
+	flag.Parse()
+
 	mux := defaultMux()
 
 	// Build the MapHandler using the mux as the fallback
@@ -13,17 +32,15 @@ func main() {
 		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
 		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
 	}
-	mapHandler := MapHandler(pathsToUrls, mux)
+	mapHandler := shorteners.MapHandler(pathsToUrls, mux)
 
 	// Build the YAMLHandler using the mapHandler as the
 	// fallback
-	yaml := `
-- path: /urlshort
-  url: https://github.com/gophercises/urlshort
-- path: /urlshort-final
-  url: https://github.com/gophercises/urlshort/tree/solution
-`
-	yamlHandler, err := YAMLHandler([]byte(yaml), mapHandler)
+	yaml, err := os.ReadFile(cfg.yamlFile)
+	if err != nil {
+		panic(err)
+	}
+	yamlHandler, err := shorteners.YAMLHandler([]byte(yaml), mapHandler)
 	if err != nil {
 		panic(err)
 	}
